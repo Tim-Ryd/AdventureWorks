@@ -1,3 +1,10 @@
+SELECT TOP 5 * FROM Sales.SalesOrderDetal
+SELECT TOP 5 * FROM Production.Product
+SELECT TOP 5 * FROM Production.ProductSubcategory
+SELECT TOP 5 * FROM Production.ProductCategory
+SELECT TOP 5 * FROM Production.ProductCostHistory
+
+
 WITH Profit AS (
     SELECT 
         p.ProductID,
@@ -8,10 +15,10 @@ WITH Profit AS (
         SUM(sod.OrderQty) AS Qty,
         SUM(sod.LineTotal) - SUM(sod.OrderQty * c.StandardCost) AS Margin
     FROM Sales.SalesOrderDetail sod
-    JOIN Production.Product p ON sod.ProductID = p.ProductID
-    LEFT JOIN Production.ProductSubcategory psc 
+    INNER JOIN Production.Product p ON sod.ProductID = p.ProductID
+    LEFT JOIN Production.ProductSubcategory psc -- Left join ifall det finns NULL-värden i Subcategory
         ON p.ProductSubcategoryID = psc.ProductSubcategoryID
-    LEFT JOIN Production.ProductCategory pc 
+    LEFT JOIN Production.ProductCategory pc  -- Ifall det finns NULL-värden i Productcategory
         ON psc.ProductCategoryID = pc.ProductCategoryID
     INNER JOIN (
         SELECT ProductID, StandardCost,

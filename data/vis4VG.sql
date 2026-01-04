@@ -1,3 +1,11 @@
+SELECT TOP 5 * FROM Sales.SalesOrderDetail
+SELECT TOP 5 * FROM Production.Product
+SELECT TOP 5 * FROM Production.ProductSubcategory
+SELECT TOP 5 * FROM Production.ProductCategory
+SELECT TOP 5 * FROM Production.ProductCostHistory
+
+USE AdventureWorks2025;
+
 WITH ProductTotals AS (
     SELECT 
         p.ProductID,

@@ -1,3 +1,11 @@
+SELECT TOP 5 * FROM Sales.SalesOrderDetail
+SELECT TOP 5 * FROM Production.Product
+SELECT TOP 5 * FROM Production.ProductSubcategory
+SELECT TOP 5 * FROM Production.ProductCategory
+SELECT TOP 5 * FROM Production.ProductCostHistory
+
+USE AdventureWorks2025;
+
 WITH Profit AS (
     SELECT 
         pc.Name AS ProductCategory,
@@ -5,12 +13,12 @@ WITH Profit AS (
         SUM(sod.OrderQty) AS Qty,
         SUM(sod.LineTotal) - SUM(sod.OrderQty * c.StandardCost) AS Margin
     FROM Sales.SalesOrderDetail sod
-    JOIN Production.Product p ON sod.ProductID = p.ProductID
-    LEFT JOIN Production.ProductSubcategory psc  -- Ifall det finns NULL-värden i Subcategory
+    INNER JOIN Production.Product p ON sod.ProductID = p.ProductID
+    LEFT JOIN Production.ProductSubcategory psc  
         ON p.ProductSubcategoryID = psc.ProductSubcategoryID
-    LEFT JOIN Production.ProductCategory pc  -- Ifall det finns NULL-värden i Productcategory
+    LEFT JOIN Production.ProductCategory pc  
         ON psc.ProductCategoryID = pc.ProductCategoryID
-    JOIN (
+    INNER JOIN (
         SELECT ProductID, StandardCost,
                ROW_NUMBER() OVER (PARTITION BY ProductID ORDER BY StartDate DESC) AS rn
         FROM Production.ProductCostHistory
@@ -30,7 +38,7 @@ SELECT
     SUM(Qty) AS TotalQty,
     SUM(Margin) * 1.0 / NULLIF(SUM(Revenue), 0) AS MarginPct,
     SUM(Margin) * 1.0 / t.GrandTotalMargin AS MarginShare,
-    RANK() OVER (ORDER BY SUM(Margin) DESC) AS CategoryRank
+    RANK() OVER (ORDER BY SUM(Margin) DESC) AS CategoryRank -- Rank utifrån total Margin
 FROM Profit
 CROSS JOIN Totals t -- Lägga till total på samtliga rader
 GROUP BY ProductCategory, t.GrandTotalMargin
